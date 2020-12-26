@@ -4,7 +4,7 @@
 # MODE         "debug" or "release".
 
 MODE = debug
-NAME = clox++
+NAME = cyon
 SOURCE_DIR := .
 CFLAGS := -std=c99 -Wall -Wextra -Werror -Wno-unused-parameter
 
