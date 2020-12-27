@@ -25,13 +25,38 @@ static int constantInstruction(const char* name, Chunk* chunk,
   return offset + 2;
 }
 
+int getLine(Chunk* chunk, int offset, int *flag_prev)
+{
+  static int old_offset = 0;
+  static int itr = 0;
+  static int i = 0;
+  if(old_offset != offset && i<chunk->line[itr+1])
+  {
+    *flag_prev = 1;
+  }
+  else if (old_offset != offset)
+  {
+    i = 0;
+    itr+=2;
+    *flag_prev = 0;
+  }
+  i = (offset-old_offset)+i+1; //some opcodes use more than 1 offset. dissambler should take care of it.
+  if(old_offset + offset == 0)
+    i++;
+  old_offset = offset;
+  return chunk->line[itr];
+}
+
 int disassembleInstruction(Chunk* chunk, int offset) {
   printf("%04d ", offset);
+  int flag_prev = 0;
+
+  int chunk_line = getLine(chunk, offset, &flag_prev);
   if (offset > 0 &&
-      chunk->line[offset] == chunk->line[offset - 1]) {
+      flag_prev == 1) {
     printf("   | ");
   } else {
-    printf("%4d ", chunk->line[offset]);
+    printf("%4d ", chunk_line);
   }
 
   uint8_t instruction = chunk->code[offset];

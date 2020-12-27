@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "chunk.h"
@@ -19,6 +20,9 @@ void freeChunk(Chunk* chunk) {
 }
 
 void writeChunk(Chunk* chunk, uint8_t byte, int line) {
+  static int ctr = 0;
+  static int itr = 0;
+  static int prev_line = -1;
   if (chunk->capacity < chunk->count + 1) {
     int oldCapacity = chunk->capacity;
     chunk->capacity = GROW_CAPACITY(oldCapacity);
@@ -29,7 +33,24 @@ void writeChunk(Chunk* chunk, uint8_t byte, int line) {
   }
 
   chunk->code[chunk->count] = byte;
-  chunk->line[chunk->count] = line;
+  if(chunk->count==0)
+  {
+    prev_line = line;
+    ctr++;
+  }
+  else
+  {
+    if(line == prev_line)
+     ctr++;
+    else
+    {
+      prev_line = line;
+      ctr=1;
+      itr+=2;
+    }
+  }
+  chunk->line[itr] = prev_line;
+  chunk->line[itr+1] = ctr;
   chunk->count++;
 }
 
